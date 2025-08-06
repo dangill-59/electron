@@ -1,0 +1,13 @@
+{
+  "name": "document-management-client",
+  "main": "src/main.js",
+  "version": "0.1.0",
+  "description": "Desktop client for document management with customizable projects",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "electron": "^29.0.0"
+  },
+  "scripts": {
+    "start": "electron ."
+  }
+}
