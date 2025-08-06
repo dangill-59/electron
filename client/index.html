@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Electron DMS</title>
+</head>
+<body>
+  <nav>
+    <button onclick="showTab('documents')">Documents</button>
+    <button onclick="showTab('admin')">Admin</button>
+    <button onclick="showTab('login')">Login</button>
+  </nav>
+  <div id="loginTab">
+    <h2>Login</h2>
+    <input id="loginUsername" placeholder="Username" />
+    <input id="loginPassword" type="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <div id="loginError" style="color:red"></div>
+  </div>
+  <div id="documentsTab" style="display:none;">
+    <h2>Documents</h2>
+    <!-- Your document management UI here -->
+  </div>
+  <div id="adminTab" style="display:none;">
+    <!-- Admin panel will be loaded by JS -->
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>
