@@ -1,10 +1,30 @@
-# Node/Electron
+# Node modules and build outputs
 node_modules/
 dist/
 build/
-.env
-.DS_Store
+out/
+*.log
 
-# SQLite/Uploads
+# OS files
+.DS_Store
+Thumbs.db
+
+# dotenv environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Electron specific
+*.asar
+electron-builder.yaml
+release/
+
+# VSCode settings
+.vscode/
+
+# Misc
 *.db
+*.sqlite
 uploads/
