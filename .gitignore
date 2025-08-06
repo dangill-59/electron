@@ -67,3 +67,6 @@ publish/
 # Ignore server binaries
 server/bin/
 server/obj/
+
+# Database files
+*.db

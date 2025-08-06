@@ -17,6 +17,22 @@ namespace DocumentDmsServer.Services
                 passwordHash TEXT, 
                 role TEXT)";
             cmd.ExecuteNonQuery();
+
+            // Check if the users table is empty and create default admin user if needed
+            // WARNING: Change the default admin credentials immediately after first use for security!
+            cmd.CommandText = "SELECT COUNT(*) FROM users";
+            var userCount = (long)cmd.ExecuteScalar()!;
+            
+            if (userCount == 0)
+            {
+                // Insert default admin user with secure password hash
+                cmd.CommandText = "INSERT INTO users (username, passwordHash, role) VALUES ($username, $hash, $role)";
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("$username", "admin");
+                cmd.Parameters.AddWithValue("$hash", BCrypt.Net.BCrypt.HashPassword("admin123"));
+                cmd.Parameters.AddWithValue("$role", "admin");
+                cmd.ExecuteNonQuery();
+            }
         }
 
         public void AddUser(string username, string password, string role)
