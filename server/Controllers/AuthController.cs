@@ -22,8 +22,16 @@ public class AuthController : ControllerBase
     public IActionResult Login([FromBody] LoginRequest req)
     {
         var user = _db.GetUserByUsername(req.Username ?? string.Empty);
-        if (user == null || !BCrypt.Net.BCrypt.Verify(req.Password ?? string.Empty, user.PasswordHash))
+        if (user == null)
+        {
+            Console.WriteLine("User not found: " + req.Username);
             return Unauthorized();
+        }
+        if (!BCrypt.Net.BCrypt.Verify(req.Password ?? string.Empty, user.PasswordHash))
+        {
+            Console.WriteLine("Password mismatch for user: " + req.Username);
+            return Unauthorized();
+        }
 
         var claims = new[] {
             new Claim(ClaimTypes.Name, user.Username),

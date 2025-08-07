@@ -24,6 +24,8 @@ public class Startup
 
         // JWT Authentication
         var jwtKey = Configuration["Jwt:Key"];
+        Console.WriteLine("DEBUG: JWT Key from config: '" + jwtKey + "'");
+        Console.WriteLine("DEBUG: JWT Key length: " + (jwtKey?.Length ?? 0));
         if (string.IsNullOrEmpty(jwtKey))
             throw new Exception("JWT Key is not configured in appsettings.json or environment variables.");
 
@@ -47,13 +49,22 @@ public class Startup
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        // Force documentdms.db and user table creation at startup
+        var userDb = new UserDb();
+
+        // Seed 'sa' user if not present
+        if (userDb.GetUserByUsername("sa") == null)
+        {
+            userDb.AddUser("sa", "SR2025$!", "superadmin");
+            Console.WriteLine("Seeded 'sa' user with default password.");
+        }
+
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
         }
 
         app.UseRouting();
-
         app.UseAuthentication();
         app.UseAuthorization();
 
