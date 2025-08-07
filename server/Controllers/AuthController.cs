@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
         var claims = new[] {
             new Claim(ClaimTypes.Name, user.Username),
             new Claim("UserId", user.Id.ToString()),
-            new Claim("Role", user.Role)
+            new Claim(ClaimTypes.Role, user.Role)
         };
         var keyString = _config["Jwt:Key"] ?? throw new Exception("JWT Key is not configured.");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
