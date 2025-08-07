@@ -4,7 +4,7 @@ using DocumentDmsServer.Services;
 
 [ApiController]
 [Route("api/projects")]
-[Authorize(Roles = "admin")]
+[Authorize(Roles = "admin,superadmin")]
 public class ProjectsController : ControllerBase
 {
     private readonly ProjectDb _db;

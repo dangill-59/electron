@@ -4,7 +4,7 @@ using DocumentDmsServer.Services;
 
 [ApiController]
 [Route("api/users")]
-[Authorize(Roles = "admin")]
+[Authorize(Roles = "admin,superadmin")]
 public class UsersController : ControllerBase
 {
     private readonly UserDb _db;
