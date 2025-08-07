@@ -20,11 +20,24 @@ public class UsersController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Deletes a user by ID. The permanent system admin user 'sa' cannot be deleted.
+    /// </summary>
+    /// <param name="id">The ID of the user to delete</param>
+    /// <returns>OK if successful, BadRequest if attempting to delete system admin</returns>
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        _db.DeleteUser(id);
-        return Ok();
+        try
+        {
+            _db.DeleteUser(id);
+            return Ok();
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Handle attempt to delete the system admin user
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     public class UserCreateModel
