@@ -33,11 +33,26 @@ public class AuthController : ControllerBase
             return Unauthorized();
         }
 
-        var claims = new[] {
+        // Get user with roles
+        var userWithRoles = _db.GetUserWithRoles(user.Id);
+        var roles = userWithRoles?.Roles ?? new List<Role>();
+        
+        // Create claims including all roles
+        var claims = new List<Claim>
+        {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim("UserId", user.Id.ToString()),
-            new Claim(ClaimTypes.Role, user.Role)
+            new Claim("UserId", user.Id.ToString())
         };
+        
+        // Add legacy single role claim for backward compatibility
+        claims.Add(new Claim(ClaimTypes.Role, user.Role));
+        
+        // Add all roles as individual claims
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim("roles", role.Name));
+        }
+
         var keyString = _config["Jwt:Key"] ?? throw new Exception("JWT Key is not configured.");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -48,10 +63,15 @@ public class AuthController : ControllerBase
             expires: DateTime.Now.AddHours(8),
             signingCredentials: creds
         );
+        
+        // Determine if user is admin (legacy check or new role-based check)
+        bool isAdmin = user.Role == "admin" || user.Role == "superadmin" || 
+                      roles.Any(r => r.Name == "admin" || r.Name == "superadmin");
+        
         return Ok(new
         {
             token = new JwtSecurityTokenHandler().WriteToken(token),
-            user = new { user.Id, user.Username, isAdmin = user.Role == "admin" || user.Role == "superadmin" }
+            user = new { user.Id, user.Username, isAdmin, roles = roles.Select(r => r.Name).ToArray() }
         });
     }
 

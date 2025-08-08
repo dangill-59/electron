@@ -8,7 +8,13 @@ using DocumentDmsServer.Services;
 public class UsersController : ControllerBase
 {
     private readonly UserDb _db;
-    public UsersController(UserDb db) { _db = db; }
+    private readonly RoleDb _roleDb;
+    
+    public UsersController(UserDb db, RoleDb roleDb) 
+    { 
+        _db = db; 
+        _roleDb = roleDb;
+    }
 
     [HttpGet]
     public IActionResult GetAll() => Ok(_db.GetUsers());
@@ -24,6 +30,36 @@ public class UsersController : ControllerBase
     public IActionResult Delete(int id)
     {
         _db.DeleteUser(id);
+        return Ok();
+    }
+
+    // New endpoints for role assignments
+
+    [HttpGet("{userId}/roles")]
+    public IActionResult GetUserRoles(int userId)
+    {
+        var roles = _db.GetUserRoles(userId);
+        return Ok(roles);
+    }
+
+    [HttpPost("{userId}/roles")]
+    public IActionResult AssignRolesToUser(int userId, [FromBody] UserRoleAssignmentRequest request)
+    {
+        _db.AssignRolesToUser(userId, request.RoleIds);
+        return Ok();
+    }
+
+    [HttpPost("{userId}/roles/{roleId}")]
+    public IActionResult AddRoleToUser(int userId, int roleId)
+    {
+        _db.AddRoleToUser(userId, roleId);
+        return Ok();
+    }
+
+    [HttpDelete("{userId}/roles/{roleId}")]
+    public IActionResult RemoveRoleFromUser(int userId, int roleId)
+    {
+        _db.RemoveRoleFromUser(userId, roleId);
         return Ok();
     }
 
