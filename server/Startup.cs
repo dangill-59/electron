@@ -51,12 +51,28 @@ public class Startup
     {
         // Force documentdms.db and user table creation at startup
         var userDb = new UserDb();
+        var roleDb = new RoleDb();
+
+        // Run migration script
+        RunMigrationScript();
 
         // Seed 'sa' user if not present
         if (userDb.GetUserByUsername("sa") == null)
         {
             userDb.AddUser("sa", "SR2025$!", "superadmin");
             Console.WriteLine("Seeded 'sa' user with default password.");
+            
+            // Also add sa to superadmin role in new system
+            var superadminRole = roleDb.GetRoleByName("superadmin");
+            if (superadminRole != null)
+            {
+                var saUser = userDb.GetUserByUsername("sa");
+                if (saUser != null)
+                {
+                    userDb.AddRoleToUser(saUser.Id, superadminRole.Id);
+                    Console.WriteLine("Assigned superadmin role to sa user.");
+                }
+            }
         }
 
         if (env.IsDevelopment())
@@ -72,5 +88,38 @@ public class Startup
         {
             endpoints.MapControllers();
         });
+    }
+
+    private void RunMigrationScript()
+    {
+        try
+        {
+            var migrationScript = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "..", "migration.sql"));
+            var connectionString = "Data Source=documentdms.db";
+            
+            using var connection = new Microsoft.Data.Sqlite.SqliteConnection(connectionString);
+            connection.Open();
+            
+            // Split script by semicolons and execute each statement
+            var statements = migrationScript.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            foreach (var statement in statements)
+            {
+                var trimmedStatement = statement.Trim();
+                if (!string.IsNullOrEmpty(trimmedStatement) && !trimmedStatement.StartsWith("--"))
+                {
+                    using var command = connection.CreateCommand();
+                    command.CommandText = trimmedStatement;
+                    command.ExecuteNonQuery();
+                }
+            }
+            
+            Console.WriteLine("Migration script executed successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error running migration script: {ex.Message}");
+            // Continue startup even if migration fails
+        }
     }
 }
