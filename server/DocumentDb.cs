@@ -26,16 +26,17 @@ public class DocumentDb
         cmd.ExecuteNonQuery();
     }
 
-    public int AddDocument(string title, string description, string filename, string owner)
+    public int AddDocument(string title, string description, string filename, string owner, int? projectId = null)
     {
         using var conn = new SqliteConnection(_connStr);
         conn.Open();
         var cmd = conn.CreateCommand();
-        cmd.CommandText = "INSERT INTO documents (title, description, filename, owner) VALUES ($title, $desc, $filename, $owner); SELECT last_insert_rowid();";
+        cmd.CommandText = "INSERT INTO documents (title, description, filename, owner, project_id) VALUES ($title, $desc, $filename, $owner, $project_id); SELECT last_insert_rowid();";
         cmd.Parameters.AddWithValue("$title", title);
         cmd.Parameters.AddWithValue("$desc", description);
         cmd.Parameters.AddWithValue("$filename", filename);
         cmd.Parameters.AddWithValue("$owner", owner);
+        cmd.Parameters.AddWithValue("$project_id", projectId.HasValue ? projectId.Value : DBNull.Value);
         var result = cmd.ExecuteScalar();
         return result != null ? (int)(long)result : 0;
     }
@@ -56,7 +57,8 @@ public class DocumentDb
                 Title = reader.IsDBNull(1) ? null : reader.GetString(1),
                 Description = reader.IsDBNull(2) ? null : reader.GetString(2),
                 Filename = reader.IsDBNull(3) ? null : reader.GetString(3),
-                Owner = reader.IsDBNull(4) ? null : reader.GetString(4)
+                Owner = reader.IsDBNull(4) ? null : reader.GetString(4),
+                ProjectId = reader.IsDBNull(5) ? null : reader.GetInt32(5)
             });
         }
         return list;
@@ -78,7 +80,8 @@ public class DocumentDb
                 Title = reader.IsDBNull(1) ? null : reader.GetString(1),
                 Description = reader.IsDBNull(2) ? null : reader.GetString(2),
                 Filename = reader.IsDBNull(3) ? null : reader.GetString(3),
-                Owner = reader.IsDBNull(4) ? null : reader.GetString(4)
+                Owner = reader.IsDBNull(4) ? null : reader.GetString(4),
+                ProjectId = reader.IsDBNull(5) ? null : reader.GetInt32(5)
             };
         }
         return null;
@@ -112,4 +115,5 @@ public class Document
     public string? Description { get; set; }
     public string? Filename { get; set; }
     public string? Owner { get; set; }
+    public int? ProjectId { get; set; }
 }

@@ -19,8 +19,21 @@ public class Startup
         services.AddSingleton<UserDb>();
         services.AddSingleton<ProjectDb>();
         services.AddSingleton<RoleDb>();
+        services.AddSingleton<DocumentDb>();
+        services.AddSingleton<CustomFieldDb>();
 
         services.AddControllers();
+
+        // Add CORS
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
+        });
 
         // JWT Authentication
         var jwtKey = Configuration["Jwt:Key"];
@@ -53,6 +66,9 @@ public class Startup
         }
 
         app.UseRouting();
+
+        // Use CORS
+        app.UseCors("AllowAll");
 
         app.UseAuthentication();
         app.UseAuthorization();

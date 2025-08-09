@@ -67,3 +67,10 @@ publish/
 # Ignore server binaries
 server/bin/
 server/obj/
+
+# Database files
+server/*.db
+server/*.db-*
+
+# Upload files
+server/uploads/
