@@ -19,7 +19,14 @@
   </div>
   <div id="documentsTab" style="display:none;">
     <h2>Documents</h2>
-    <!-- Your document management UI here -->
+    <div>
+      <button onclick="showUploadForm()">Upload Document</button>
+      <button onclick="loadDocuments()">Refresh</button>
+      <button onclick="showSearchForm()">Search by Custom Fields</button>
+    </div>
+    <div id="documentContent">
+      <!-- Documents will be loaded here -->
+    </div>
   </div>
   <div id="adminTab" style="display:none;">
     <!-- Admin panel will be loaded by JS -->
