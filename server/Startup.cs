@@ -19,6 +19,8 @@ public class Startup
         services.AddSingleton<UserDb>();
         services.AddSingleton<ProjectDb>();
         services.AddSingleton<RoleDb>();
+        services.AddSingleton<DocumentDb>();
+        services.AddSingleton<CustomFieldDb>();
 
         services.AddControllers();
 
