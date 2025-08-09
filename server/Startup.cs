@@ -24,6 +24,17 @@ public class Startup
 
         services.AddControllers();
 
+        // Add CORS
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
+        });
+
         // JWT Authentication
         var jwtKey = Configuration["Jwt:Key"];
         if (string.IsNullOrEmpty(jwtKey))
@@ -55,6 +66,9 @@ public class Startup
         }
 
         app.UseRouting();
+
+        // Use CORS
+        app.UseCors("AllowAll");
 
         app.UseAuthentication();
         app.UseAuthorization();
